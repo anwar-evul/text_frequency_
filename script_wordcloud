@@ -1,0 +1,62 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Jul 14 12:02:42 2024
+
+@author: anwar
+"""
+
+import pandas as pd
+import sys
+import datetime
+import numpy as np
+import unicodedata as un
+from datetime import date,datetime,timedelta
+from glob import glob
+import re
+from tkinter import Tk, filedialog
+import os , glob 
+import nltk #Natural Language Toolkit atau disingkat NLTK, adalah libray python untuk bekerja dengan permodelan teks.
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+import re # impor modul regular expression
+factory = StemmerFactory()
+stemmer = factory.create_stemmer()
+import string
+# sentence = 'Perekonomian Indonesia sedang dalam pertumbuhan yang membanggakan'
+# output   = stemmer.stem(sentence)
+# print(output)
+
+#%%
+read_file = pd.read_csv(r'C:\Users\anwar\Downloads\Compressed\ribet\dataset_sms_spam_v2.csv')
+read_file['Teks'] = read_file['Teks'].str.lower()
+read_file['Teks'] = read_file['Teks'].apply(str)
+read_file['Teks'] = read_file['Teks'].replace(np.nan, '')
+read_file['Teks'] = read_file['Teks'].str.replace(r"\d+","",regex=True) #menghilangkan angka
+pattern = r'['+string.punctuation+']'
+read_file['Teks'] = read_file['Teks'].str.replace(pattern,"",regex=True) # menghilangkan symbol
+read_file['Teks'] =read_file['Teks'].str.strip() # menghilangkan white space
+
+read_file['tampung1'] = read_file['Teks'].str.split()
+
+from collections import Counter
+read_file['coba'] = read_file['tampung1'].apply(lambda x: Counter(x).most_common(1))
+
+read_file['coba'] = read_file['coba'].apply(str)
+read_file[['test12','ai']] = read_file['coba'].str.split(', ', n=1,expand=True)
+read_file['test12'] = read_file['test12'].str.replace(pattern,"",regex=True)
+read_file['ai'] = read_file['ai'].str.replace(pattern,"",regex=True)
+read_file['ai'] = read_file['ai'].apply(int)
+plot = read_file.groupby(["test12"])["ai"].sum().plot(kind="barh", title="DataFrameGroupBy Plot")
+plot.show()
+
+check = read_file.groupby(["test12"])["ai"].sum()
+
+#%%
+
+#%%
+pth_drop_file = r"C:\Users\anwar\Downloads\Compressed\ribet\result.xlsx"
+import pandas.io.formats.excel
+pandas.io.formats.excel.ExcelFormatter.header_style = None
+writer = pd.ExcelWriter(pth_drop_file, engine='xlsxwriter')
+read_file.to_excel(writer,sheet_name='Sheet0', index=False)
+writer.close()
+#%%
