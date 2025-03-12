@@ -1,0 +1,342 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Oct 25 10:18:10 2024
+
+@author: saifula
+"""
+#text minning
+import pandas as pd
+
+# Contoh DataFrame untuk komentar
+data_comments = {
+    'Comments': [
+        "Ini adalah komentar positif",
+        "Sangat buruk dan mengecewakan",
+        "Komentar netral",
+        "Tidak ada kata yang jelas",
+        "baik lakukan"
+    ], 'no_unik': ['x1','x2','x3','x4','x5']}
+sr = pd.DataFrame(data_comments)
+# DataFrame untuk kategori dan kata-kata
+data_kategori = {
+    'Kategori': ['Positif', 'Negatif', 'Netral'],
+    'Kata': [
+        ['positif', 'baik', 'bagus'],
+        ['buruk', 'jelek', 'mengecewakan'],
+        ['netral']
+    ]}
+df_kategori = pd.DataFrame(data_kategori)
+# Fungsi untuk flagging kategori
+def flag_kategori(comments):
+    komentar_flat = ' '.join(comments)
+    for _, row in df_kategori.iterrows():
+    # for index, row in df_kategori.iterrows():
+        kata_list = row['Kata']
+        if any(word in komentar_flat for word in kata_list):
+            return row['Kategori']
+    return 'Tidak Diketahui'
+
+# Menambahkan kolom kategori
+sr['Kategori'] = sr['Comments'].str.split().apply(flag_kategori)
+print(sr)
+
+
+
+
+#%%
+import pandas as pd
+data = {
+    'Nama': ['Alice', 'Bob', 'Charlie'],
+    'Umur': [25, 30, 35]}
+df = pd.DataFrame(data)
+
+# Menggunakan .iterrows() untuk mencetak nama dan umur
+for index, row in df.iterrows():
+    print(f"Nama: {row['Nama']}, Umur: {row['Umur']}")
+# coba menggunakan _    
+for _, row in df.iterrows():
+    print(f"Nama: {row['Nama']}, Umur: {row['Umur']}")
+    print(row)
+check = row
+    #%%
+import pandas as pd
+import numpy as np
+# Contoh DataFrame untuk komentar
+data_comments = {
+    'Comments': [
+        "Ini adalah komentar positif",
+        "Sangat buruk dan mengecewakan",
+        "Komentar netral",
+        "Tidak ada kata yang jelas",
+        "baik lakukan",
+        "bagus banget fitur yang ditawarkan terimakasih"
+    ], 'no_unik': ['x1','x2','x3','x4','x5','x6']}
+sr = pd.DataFrame(data_comments)
+
+data_kategori = {'kata': ['positif|baik|bagus banget|bagus','jelek|buruk|gk bagus'],
+                 'kategori': ['Positif','negatif']}
+data_kategori = pd.DataFrame(data_kategori)
+
+# Menggabungkan semua kata kunci dan kategori
+sr['Ex'] = "Tidak Ditemukan"  # Inisialisasi kolom Ex dengan nilai default
+for index, row in data_kategori.iterrows():
+    pattern = row['kata']
+    kategori = row['kategori']
+    sr.loc[sr['Comments'].str.contains(pattern, case=False, regex=True, na=False), 'Ex'] = kategori
+
+print(sr)
+#%%
+import re
+from collections import Counter
+# Contoh string
+text = "Saya lupa sesuatu, dan saya lupa lagi. saya mau makan"
+
+# Pola regex
+pattern = r'\s+lupa+\s|\s+saya+\s'
+
+# Mencari semua kecocokan
+matches = re.findall(pattern, text)
+
+# Menampilkan hasil
+print("Hasil kecocokan:", matches)
+
+# Jika ingin mengganti dengan sesuatu
+text_modified = re.sub(pattern, ' gk tau ', text)
+print("Teks setelah penggantian:", text_modified)
+Counter(matches)
+
+#%% tahap 2
+import pandas as pd
+Dictionary = pd.read_excel(r'C:\Users\saifula\OneDrive - DBS Bank Ltd\R_Tech_Issue\Dictionary_Updates.xlsx', sheet_name='Dictionary', dtype='str')
+
+colu = ['coba','Items']
+Dictionary.reindex(columns=colu)
+
+Dictionary = Dictionary[["Dictionary","Classify",
+                     "Items",
+                     "Dictionary",
+                     "RegexFinal"]]
+
+# Assuming 'Dictionary' is a pandas DataFrame
+Dictionary_T = Dictionary.pivot(index='Classify', columns='Items', values='RegexFinal')  # Replace 'value_column' with the appropriate column name
+Dictionary_T = Dictionary_T.reset_index()
+# Selecting specific columns
+selected_columns = [
+    'Classify', 'Login', 'Registration', 'PIN CC', 'E-Statement/E-Advice', 'CC Information', 
+    'Deposito', 'Transaction History', 'Reward', 'Customer Information', 'Obligasi', 
+    'Bill Payment', 'Cashline Related', 'Agen Booking', 'Account Opening', 
+    'Account Information', 'Testing Purpose', 'OTP', 'CC Installment', 
+    'Request Debit Card', 'Payee List', 'Loan', 'Investment Information', 
+    'Maxi Saver', 'Remittance', 'Fund Transfer', 'Crash', 
+    'Change device notification', 'Block code CC', 'Main Dashboard', 
+    'Network Connectivity', 'Top-up', 'Double CIF', 'CC Supplement', 
+    'Data Maintenance', 'MCA', 'SMS Notif', 'LOC', 'Reksadana']
+Dictionary_T = Dictionary_T[selected_columns]
+
+
+
+#%%
+import pandas as pd
+import re
+
+# Membaca file Excel yang berisi dictionary
+Dictionary = pd.read_excel(r'C:\Users\saifula\OneDrive - DBS Bank Ltd\R_Tech_Issue\Dictionary_Updates.xlsx', sheet_name='Dictionary', dtype='str')
+Dictionary = Dictionary[["Dictionary", "Classify", "Items", "Dictionary", "RegexFinal"]]
+
+
+# Pivot data sesuai dengan struktur yang diinginkan
+Dictionary_T = Dictionary.pivot(index='Classify', columns='Items', values='RegexFinal')
+Dictionary_T = Dictionary_T.reset_index()
+
+# Memilih kolom-kolom yang relevan
+selected_columns = [
+    'Classify', 'Login', 'Registration', 'PIN CC', 'E-Statement/E-Advice', 'CC Information', 
+    'Deposito', 'Transaction History', 'Reward', 'Customer Information', 'Obligasi', 
+    'Bill Payment', 'Cashline Related', 'Agen Booking', 'Account Opening', 
+    'Account Information', 'Testing Purpose', 'OTP', 'CC Installment', 
+    'Request Debit Card', 'Payee List', 'Loan', 'Investment Information', 
+    'Maxi Saver', 'Remittance', 'Fund Transfer', 'Crash', 
+    'Change device notification', 'Block code CC', 'Main Dashboard', 
+    'Network Connectivity', 'Top-up', 'Double CIF', 'CC Supplement', 
+    'Data Maintenance', 'MCA', 'SMS Notif', 'LOC', 'Reksadana']
+Dictionary_T = Dictionary_T[selected_columns]
+
+# Membuat regex untuk mencari kata-kata tertentu dalam teks
+keywords_regex = r'\s+lupa+\s|\s+username+\s|\s+password+\s|\s+log in+\s|\s+login+\s|\s+login.+\s|\s+otentikasi+\s|\s+authentifikasi+\s'
+
+# Fungsi untuk mencari kategori berdasarkan kata-kata yang cocok
+def classify_text(text):
+    matched_categories = {}  # Untuk menyimpan kategori yang cocok dan frekuensinya
+
+    # Cek setiap kolom (kategori) dalam DataFrame untuk mencocokkan regex
+    for category in selected_columns[1:]:
+        regex = Dictionary_T[category].iloc[0]  # Ambil regex untuk kategori tertentu
+        if isinstance(regex, str) and regex.strip():
+            # Mencocokkan kata yang ditemukan dengan regex yang ada di dictionary
+            matches = re.findall(regex, text, re.IGNORECASE)
+            matched_categories[category] = len(matches)  # Simpan jumlah kemunculan kata
+
+    # Mengembalikan kategori yang paling banyak ditemukan
+    if matched_categories:
+        return max(matched_categories, key=matched_categories.get)
+    return "Unknown"
+
+# Contoh penggunaan: 
+# Misalkan kita punya beberapa teks yang ingin dikelompokkan
+texts = [
+    "Lupa username dan password, saya tidak bisa login",
+    "Masalah saat melakukan pembayaran tagihan melalui aplikasi",
+    "Login gagal karena autentikasi tidak berhasil",
+    "registrasi karena autentikasi tidak berhasil registrasi lagi"
+]
+
+# Membuat DataFrame untuk teks dan kategori yang ditemukan
+results = []
+for text in texts:
+    category = classify_text(text)
+    results.append({"Text": text, "Category": category})
+
+# Menampilkan hasil klasifikasi
+result_df = pd.DataFrame(results)
+print(result_df)
+
+#%%
+import pandas as pd
+import re
+
+# Membaca file Excel yang berisi dictionary
+Dictionary = pd.read_excel(r'C:\Users\saifula\OneDrive - DBS Bank Ltd\R_Tech_Issue\Dictionary_Updates.xlsx', sheet_name='Dictionary', dtype='str')
+
+# Menyaring kolom yang diperlukan
+Dictionary = Dictionary[["Items", "RegexFinal"]]
+
+# Fungsi untuk mencari kategori berdasarkan teks dan regex
+def classify_text(text):
+    matched_categories = {}  # Untuk menyimpan kategori yang cocok dan frekuensinya
+    
+    # Iterasi melalui setiap baris dalam DataFrame Dictionary
+    for index, row in Dictionary.iterrows():
+        regex = row['RegexFinal']
+        category = row['Items']
+        
+        if isinstance(regex, str) and regex.strip():
+            # Mencocokkan teks dengan regex
+            matches = re.findall(regex, text, re.IGNORECASE)
+            matched_categories[category] = len(matches)  # Simpan jumlah kemunculan kata
+
+    # Mengembalikan kategori yang paling banyak ditemukan (bobot tertinggi)
+    if matched_categories:
+        return max(matched_categories, key=matched_categories.get)
+    return "Unknown"  # Jika tidak ada kategori yang cocok
+
+# Contoh penggunaan dengan beberapa teks
+texts = [
+    "Lupa username dan password, saya tidak bisa login",
+    "Masalah saat melakukan pembayaran tagihan melalui aplikasi",
+    "Login gagal karena autentikasi tidak berhasil"
+]
+
+# Membuat DataFrame untuk teks dan kategori yang ditemukan
+results = []
+for text in texts:
+    category = classify_text(text)
+    results.append({"Text": text, "Category": category})
+
+
+
+# Menampilkan hasil klasifikasi
+result_df = pd.DataFrame(results)
+print(result_df)
+
+#%%
+
+import pandas as pd
+import re
+
+# Membaca file Excel yang berisi dictionary
+Dictionary = pd.read_excel(r'C:\Users\saifula\OneDrive - DBS Bank Ltd\R_Tech_Issue\Dictionary_Updates.xlsx', sheet_name='Dictionary', dtype='str')
+
+# Menyaring kolom yang diperlukan
+Dictionary = Dictionary[["Items", "RegexFinal"]]
+
+# Contoh teks yang ingin dikelompokkan
+texts = [
+    "Lupa username dan password, saya tidak bisa login",
+    "Masalah saat melakukan pembayaran tagihan melalui aplikasi",
+    "Login gagal karena autentikasi tidak berhasil",
+    "registrasi karena autentikasi tidak berhasil registrasi lagi"
+]
+
+# List untuk menyimpan hasil klasifikasi
+results = []
+
+# Iterasi melalui setiap teks
+for text in texts:
+    matched_categories = {}  # Untuk menyimpan kategori yang cocok dan frekuensinya
+    
+    # Iterasi setiap baris di DataFrame untuk mencocokkan regex
+    for index, row in Dictionary.iterrows():
+        regex = row['RegexFinal']  # Regex yang digunakan
+        category = row['Items']  # Kategori untuk regex tersebut
+        
+        if isinstance(regex, str) and regex.strip():  # Pastikan regex valid
+            # Mencocokkan teks dengan regex
+            matches = re.findall(regex, text, re.IGNORECASE)
+            matched_categories[category] = len(matches)  # Simpan jumlah kemunculan kata
+    
+    # Menentukan kategori yang memiliki kecocokan terbanyak
+    if matched_categories:
+        best_category = max(matched_categories, key=matched_categories.get)
+    else:
+        best_category = "Unknown"  # Jika tidak ada kategori yang cocok
+    
+    # Menyimpan hasil untuk teks tersebut
+    results.append({"Text": text, "Category": best_category})
+
+# Menampilkan hasil klasifikasi dalam bentuk DataFrame
+result_df = pd.DataFrame(results)
+print(result_df)
+
+#%%
+import xlsxwriter
+
+# Nama file dan password untuk proteksi
+file_name = 'Fee_waive_Notif_Base.xlsx'
+password = "Str0ngPwd!1"
+
+# Membuat workbook dan worksheet
+workbook = xlsxwriter.Workbook(file_name)
+
+# Menambahkan beberapa worksheet
+sheet_names = ["Original_From_SR", "Approved", "Decline", "Approved 50%"]
+for sheet_name in sheet_names:
+    worksheet = workbook.add_worksheet(sheet_name)
+    
+    # Melindungi worksheet dengan password dan pengaturan proteksi
+    worksheet.protect(password)
+    
+    # Mengatur opsi proteksi
+    # lockFormattingCells = False, lockFormattingColumns = False, lockInsertingColumns = True, lockDeletingColumns = True
+    worksheet.set_column('A:A', None, None, {'locked': False})  # Membuka kunci format sel untuk kolom A (misalnya)
+    
+    # Mengunci penghapusan dan penyisipan kolom
+    worksheet.set_protect({'insert_column': True, 'delete_column': True, 'format_columns': False, 'format_cells': False})
+
+# Menyimpan workbook
+workbook.close()
+
+#%%
+beginDate = '2024-11-01'
+endDate = '2024-11-10'
+curdate = '2024-11-15'
+holidays = ['2024-11-03', '2024-11-05']
+
+# Menghitung hari kerja tanpa mengurangi 1 (startdtcnt=True)
+result1 = networkDays(beginDate, endDate, curdate, holidays, startdtcnt=True)
+print(result1)  # Output: jumlah hari kerja termasuk hari pertama
+
+# Menghitung hari kerja dengan mengurangi 1 (startdtcnt=False)
+result2 = networkDays(beginDate, endDate, curdate, holidays, startdtcnt=False)
+print(result2)  # Output: jumlah hari kerja setelah mengurangi 1 hari pertama
+
+#%%
